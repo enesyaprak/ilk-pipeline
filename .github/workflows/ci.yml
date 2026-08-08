@@ -1,0 +1,25 @@
+name: CI                        # Actions sekmesinde görünecek isim
+
+on:                             # TETİKLEYİCİ: ne zaman çalışsın
+  push:
+    branches: [main]            # main'e push olunca
+  pull_request:                 # ve her PR'da
+
+jobs:                           # işler
+  test:                         # job'ın adı (senin seçimin)
+    runs-on: ubuntu-latest      # hangi makinede koşsun (GitHub bedava veriyor)
+
+    steps:                      # adımlar, sırayla çalışır
+      - name: Kodu çek
+        uses: actions/checkout@v4        # hazır "action" kullan
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıkları kur
+        run: pip install -r requirements.txt    # run = kabuk komutu çalıştır
+
+      - name: Testleri çalıştır
+        run: pytest -v

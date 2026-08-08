@@ -23,3 +23,16 @@ jobs:                           # işler
 
       - name: Testleri çalıştır
         run: pytest -v
+ lint:                                # ← 2. JOB (test ile AYNI hizada, 2 boşluk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ruff kur
+        run: pip install ruff
+      - name: Kod kalitesini denetle
+        run: ruff check .

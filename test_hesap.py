@@ -1,5 +1,7 @@
 import pytest
-from hesap import topla, bol
+
+from hesap import bol, topla
+
 
 def test_topla():
     assert topla(2, 3) == 5

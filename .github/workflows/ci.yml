@@ -5,8 +5,7 @@ on:
     branches: [main]
   pull_request:
 
-jobs:
-                                  # ← bu blok birden fazla job tutar
+jobs:                                  # ← bu blok birden fazla job tutar
  test:
     runs-on: ubuntu-latest
     strategy:

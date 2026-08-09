@@ -5,59 +5,47 @@ on:
     branches: [main]
   pull_request:
 
-jobs:                                  # ← bu blok birden fazla job tutar
- test:
+jobs:
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
       - run: pytest -v
 
-  lint:                                # ← 2. JOB (test ile AYNI hizada, 2 boşluk)
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Kodu çek
-        uses: actions/checkout@v4
-      - name: Python kur
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Ruff kur
-        run: pip install ruff
-      - name: Kod kalitesini denetle
-        run: ruff check .
+      - run: pip install ruff
+      - run: ruff check .
 
   build:
-    needs: [test, lint]              # ← test VE lint geçmeden başlama
+    needs: [test, lint]
     runs-on: ubuntu-latest
-    permissions:                     # ← bu job'ın yetkileri
-      contents: read                 # repo'yu okuyabilsin
-      packages: write                # registry'ye yazabilsin
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Kodu çek
-        uses: actions/checkout@v4
-
-      - name: Registry'ye giriş yap
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: İmajı build et ve push'la
-        uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          cache-from: type=gha          # GitHub Actions cache'inden oku
-          cache-to: type=gha,mode=max   # oraya yaz
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest

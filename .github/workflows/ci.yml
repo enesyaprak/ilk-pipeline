@@ -5,21 +5,21 @@ on:
     branches: [main]
   pull_request:
 
-jobs:                                  # ← bu blok birden fazla job tutar
-
-  test:                                # ← 1. JOB (2 boşluk girinti)
+jobs:
+                                  # ← bu blok birden fazla job tutar
+ test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
-      - name: Kodu çek
-        uses: actions/checkout@v4
-      - name: Python kur
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - name: Bağımlılıkları kur
-        run: pip install -r requirements.txt
-      - name: Testleri çalıştır
-        run: pytest -v
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pytest -v
 
   lint:                                # ← 2. JOB (test ile AYNI hizada, 2 boşluk)
     runs-on: ubuntu-latest
@@ -34,6 +34,7 @@ jobs:                                  # ← bu blok birden fazla job tutar
         run: pip install ruff
       - name: Kod kalitesini denetle
         run: ruff check .
+
   build:
     needs: [test, lint]              # ← test VE lint geçmeden başlama
     runs-on: ubuntu-latest
@@ -56,6 +57,8 @@ jobs:                                  # ← bu blok birden fazla job tutar
         with:
           context: .
           push: true
+          cache-from: type=gha          # GitHub Actions cache'inden oku
+          cache-to: type=gha,mode=max   # oraya yaz
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest

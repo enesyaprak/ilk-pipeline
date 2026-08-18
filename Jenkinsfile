@@ -8,7 +8,6 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                sh 'python3 --version'
                 sh 'echo "test asamasi calisti - build no: ${BUILD_NUMBER}"'
             }
         }

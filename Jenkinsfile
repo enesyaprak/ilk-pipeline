@@ -7,11 +7,12 @@ pipeline {
 
     stages {
         stage('Test') {
+            agent { docker { image 'python:3.12-slim' } }
             steps {
-                sh 'echo "test asamasi calisti - build no: ${BUILD_NUMBER}"'
+                sh 'pip install -r requirements.txt'
+                sh 'pytest -v'
             }
         }
-
         stage('Lint') {
             steps {
                 sh 'echo "lint asamasi"'
